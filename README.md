@@ -1,4 +1,4 @@
-# quote-server
+# Toronto/Montreal Exchange Quotefeed Server
 A high performance, low latency quote server for Toronto & Montreal Exchangess quote server 
 publishing quotes to Marketcetera trading platform. This was written in Apr 2012. 
 The server processes multicast traffic, as broadcast by the Exchanges and using 
