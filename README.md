@@ -2,14 +2,14 @@
 A high performance, low latency quote server for Toronto & Montreal Exchangess quote server 
 publishing quotes to Marketcetera trading platform. This was written in Apr 2012. 
 The server processes multicast traffic, as broadcast by the Exchanges and using 
-Google Protocol Buffers publishes to Marketcetera Java clients. 
+Google Protocol Buffers publishes to Marketcetera Java clients, version 2.4.0. 
 
 Technolologies used in this server are:
   ZeroMq - https://zeromq.org/
   libev - http://software.schmorp.de/pkg/libev.html
   tommyDS - http://tommyds.sourceforge.net
   Google Protocol Buffers - https://developers.google.com/protocol-buffers
-  Marketcetera - https://www.marketcetera.com/
+  Marketcetera - https://www.marketcetera.com/ 
   Lime Financial - https://lime.co/
   
 I haven't maintained the code since it was used in production from 2012-2014. For support
