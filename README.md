@@ -12,4 +12,4 @@ Technolologies used in this server are:
   Marketcetera - https://www.marketcetera.com/
   
 I haven't maintained the code since it was used in production from 2012-2014. For support, 
-please see above links and contact the individuals direcly.
+please see above links and contact the individuals directly.
