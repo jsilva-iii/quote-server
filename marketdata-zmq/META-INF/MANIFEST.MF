@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: com.acme.modules.mdata.zmq;singleton:=true
+Bundle-Vendor: Blackwatch Capital Corp.
+Bundle-Name: TMX  Marketdata Module
+Bundle-Version: 2.4.0
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.marketcetera.core,
+ org.junit4;resolution:=optional,
+ com.zmq;bundle-version="2.3.3"
+Eclipse-RegisterBuddy: org.marketcetera.core
+Export-Package: org.acme.marketdata.zmq;uses:="org.marketcetera.module,org.marketcetera.marketdata"
+Bundle-ClassPath: zmq.jar,
+ .

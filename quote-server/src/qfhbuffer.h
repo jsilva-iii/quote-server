@@ -17,13 +17,33 @@
 // This is part of a Multicast Quote Feed Server for :
 // Toronto TL1 and Montreak HSVF depth quotes
 
-#ifndef MC_SOCKET_R_H_
-#define MC_SOCKET_R_H_
+#ifndef QFHBUFFER_H_
+#define QFHBUFFER_H_
 #include "qfh.h"
+#include "uthash.h"
 
-#define MIN_PORT 1024   /* minimum port allowed */
-#define MAX_PORT 65535  /* maximum port allowed */
+#define FPATH_LEN 255
+#define F_TYPES_SOD 0
+#define F_DES_SOD "tsx_symbols.csv"
 
-//void config_set_auto_convert(config_t *config, int flag);
-extern int mc_socket_r(ssocklistener * mc_args);
-#endif /* MC_SOCKET_R_H_ */
+#define F_TYPES_EOD 1
+#define F_DES_EOD "tsx_eod.csv"
+
+#define F_TYPES_DIV 2
+#define F_DES_DIV "tsx_dividends.csv"
+
+#define F_TYPES_MOC 3
+#define F_DES_MOC "tsx_moc.csv"
+
+#define F_TYPES_FUT_EOD 4
+#define F_DES_FUT_EOD "bdm_eod.csv"
+
+#define F_TYPES_FUT_STAT 5
+#define F_DES_FUT_STAT "bdm_symbols.csv"
+
+#define F_TYPES_NUM (F_TYPES_FUT_STAT+1)
+
+
+int init_qfbuffer( void * ) ;
+
+#endif /* QFMONITOR_H_ */

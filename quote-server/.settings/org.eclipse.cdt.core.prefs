@@ -1,0 +1,11 @@
+eclipse.preferences.version=1
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1242399739/LD_LIBRARY_PATH/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1242399739/LD_LIBRARY_PATH/operation=append
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1242399739/LD_LIBRARY_PATH/value=/home/jsilva/dev/lib
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1242399739/append=true
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1242399739/appendContributed=true
+environment/project/cdt.managedbuild.config.gnu.exe.release.1876655399/LD_LIBRARY_PATH/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.exe.release.1876655399/LD_LIBRARY_PATH/operation=append
+environment/project/cdt.managedbuild.config.gnu.exe.release.1876655399/LD_LIBRARY_PATH/value=/home/jsilva/dev/lib
+environment/project/cdt.managedbuild.config.gnu.exe.release.1876655399/append=true
+environment/project/cdt.managedbuild.config.gnu.exe.release.1876655399/appendContributed=true

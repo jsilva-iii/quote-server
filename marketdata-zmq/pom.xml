@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.bwcc</groupId>
+		<artifactId>marketdata</artifactId>
+		<version>2.4.0</version>
+	</parent>
+	<artifactId>marketdata-zmq</artifactId>
+	<packaging>jar</packaging>
+
+	<name>ZMQ Marketdata Module</name>
+
+	<dependencies>
+
+		<!-- Compile. -->
+
+		<!-- mvn install:install-file -Dfile=zmq.jar -DartifactId=zmq -DgroupId=org.zeromq 
+			-Dversion=3.2 -Dpackaging=jar -->
+
+		<!-- Runtime. -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+		</dependency>
+
+		<!-- Testing. -->
+	</dependencies>
+
+	<build>
+		<plugins>
+
+			<!-- Configure Eclipse IDE metadata. -->
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<configuration>
+					<pde>true</pde>
+					<manifest>null</manifest>
+					<resolveDependencies>false</resolveDependencies>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

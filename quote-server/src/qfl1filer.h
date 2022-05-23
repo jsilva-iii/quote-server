@@ -17,13 +17,9 @@
 // This is part of a Multicast Quote Feed Server for :
 // Toronto TL1 and Montreak HSVF depth quotes
 
-#ifndef MC_SOCKET_R_H_
-#define MC_SOCKET_R_H_
-#include "qfh.h"
-
-#define MIN_PORT 1024   /* minimum port allowed */
-#define MAX_PORT 65535  /* maximum port allowed */
-
-//void config_set_auto_convert(config_t *config, int flag);
-extern int mc_socket_r(ssocklistener * mc_args);
-#endif /* MC_SOCKET_R_H_ */
+#ifndef QFL1FILER_H_
+#define QFL1FILER_H_
+#include "qfl1.h"
+void init_qfl1quotefileR(void* outfd);
+void * qfl1quotefileR(void *thrdarg) ;
+#endif /* QFL1FILER_H_ */

@@ -1,0 +1,101 @@
+syntax = "proto2";
+package QuoteLib;
+
+option java_package = "org.acme.quotelib";
+option java_outer_classname = "Msgs";
+
+enum MsgTypes{
+        // Key length
+        KVMSG_KEY_MAX=16;
+        // Key gets set as
+        KEY_TYPE_SEPARATOR=30;
+        //Message types
+        UNDEFINED =0;
+        QUOTE = 1;
+        MOC   = 2;
+        TRADE = 3;
+        TRADE_CXL=4;
+        HALT  = 5;
+        RESUME = 6;
+        INDEX =7;
+        EQTYSUMMARY=8;
+        DIVIDEND=9;
+        HILO52=10;
+        BULLETIN =11;
+        EQUITY_VOLUME=12;
+        // EQUITY_INFO=13;
+}
+
+message Quote
+{
+        required int32          MsgType=1               [default=0];            //Types Quote + MOC
+        required float          ask=2                   [default=0];
+        required float          bid=3                   [default=0];
+        required float          askSize=4               [default=0];
+        required float          bidSize=6               [default=0];
+        required bool           isHalted=7              [default=false];        // 0 normal - 1 halted
+}
+
+
+// Trade message + Trade cxl
+message Trade
+{
+        required int32          MsgType=1               [default=0];            //Types TRADE + TRADE_CXL
+        required float          last=2                  [default=0];
+        required int32          volume=3                [default=0];
+        optional int32          buyerID=4               [default=0];            // Buyer ID
+        optional int32      	sellerID=5          [default=0];            // Seller ID
+        optional string         trdTime=6               [default=""];           // HHMMSS
+        optional float          chgFromClose=7  [default=0];            // price change lastrade - prev close
+        optional string         markers=8               [default=""];
+
+}
+
+//For Halt and Resume trading
+message HaltResume{
+                required int32          MsgType=1               [default=0];
+                optional string         timeHalted=2    [default=""];
+                optional string         reasonForHalt=3 [default=""];
+                optional string         expectedOpen=4  [default=""];
+}
+
+// Index Level
+message Index{
+        required int32          MsgType=1               [default=0];
+        required string         index=2                 [default=""];
+        required string         time=3                  [default=""];
+        required float          last=4                  [default=0];
+        required float          change=5                [default=0];
+        required int32          volume=6                [default=0];
+        required int32          value=7                 [default=0];
+        required float          high=8                  [default=0];
+        required float          low=9                   [default=0];
+        required bool           close=10                [default=false];
+        required float          open=11                 [default=0];
+}
+
+// Trade Summary
+message EquitySummary{
+        required int32          MsgType=1               [default=0];
+}
+// Dividend
+message Dividend{
+        required int32          MsgType=1               [default=0];
+}
+// High Low transactions
+message HiLo52{
+        required int32          MsgType=1               [default=0];
+}
+//
+message EquityVolume{
+        required int32          MsgType=1               [default=0];
+}
+
+message Moc{
+        required int32  MsgType=1               [default=0];
+        optional float  side=2                  [default=0];
+        optional float ccp=3                    [default=0];
+        optional float vwap=4                   [default=0];
+        optional string marker=5                [default=""];
+}
+

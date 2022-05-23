@@ -16,14 +16,23 @@
 //
 // This is part of a Multicast Quote Feed Server for :
 // Toronto TL1 and Montreak HSVF depth quotes
+// This will take snapshots of current quotes in memory
 
-#ifndef MC_SOCKET_R_H_
-#define MC_SOCKET_R_H_
+#ifndef QSNAPSHOT_H_
+#define QSNAPSHOT_H_
 #include "qfh.h"
 
-#define MIN_PORT 1024   /* minimum port allowed */
-#define MAX_PORT 65535  /* maximum port allowed */
+// typedef for snapshot
+typedef struct sqsnapshot {
+	int feed_type;     // type of object
+	pthread_t pthrd;
+	int brun;
+	const sqfhbuffer *buffer;
+	config_t cfg_file;
+	char configfile[CONFIG_CON_STR_LEN];
+	char refstr[CONFIG_CONSTR_SZ];
+} sqsnapshot;
 
-//void config_set_auto_convert(config_t *config, int flag);
-extern int mc_socket_r(ssocklistener * mc_args);
-#endif /* MC_SOCKET_R_H_ */
+int init_qsnapshot(sqsnapshot * config);
+
+#endif /* QFH_H_ */

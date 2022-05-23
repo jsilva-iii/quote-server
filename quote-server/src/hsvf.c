@@ -1,4 +1,4 @@
-//Copyright (C) Apr 2013 Jorge Silva, Gordon Tani
+//Copyright (C) Apr 2012 Jorge Silva, Gordon Tani
 //
 //This program is free software; you can redistribute it and/or
 //modify it under the terms of the GNU General Public License

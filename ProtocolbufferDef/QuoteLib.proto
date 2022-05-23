@@ -1,0 +1,559 @@
+//Copyright (C) Apr 2012 Jorge Silva, Gordon Tani
+//
+//This program is free software; you can redistribute it and/or
+//modify it under the terms of the GNU General Public License
+//as published by the Free Software Foundation; either version 2
+//of the License, or (at your option) any later version.
+//
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+//
+//You should have received a copy of the GNU General Public License
+//along with this program; if not, write to the Free Software
+//Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA./*
+//
+// This is part of a Multicast Quote Feed Server for :
+// Toronto TL1 and Montreak HSVF depth quotes
+// This is the Definition for the Protocol Buffers - everytime this is changed, one
+// needs to compile and check in the new definitions
+// Please see for syntax and support https://developers.google.com/protocol-buffers
+
+syntax = "proto2";
+
+import "descriptor.proto";
+package QuoteLib;
+
+//option java_package = "org.bwcc.quotelib";
+option java_package = "org.bwcc.marketdata.zmq";
+
+option java_outer_classname = "Msgs";
+extend google.protobuf.EnumValueOptions {
+    optional string divdes = 54321;
+    optional string ccy = 54322;
+    optional string bdm_quote_status = 54323; //  for montreal x
+    optional string stk_status = 54324; //
+    optional string mkt_status = 54325; //
+}
+
+// All Constants
+enum CONSTANTS {
+    KVMSG_KEY_MAX = 33; // Separator between message type and symbol
+    KEY_TYPE_SEPARATOR = 30;
+}
+
+// Custom enums with descriptors
+enum BDMQuoteStatus {
+    S_SUSPENDED = -4 [(bdm_quote_status) = "Suspended phase"];
+    R_RESERVED = -3 [(bdm_quote_status) = "Reserved phase"];
+    Y_PRE_OPEN = -2 [(bdm_quote_status) = "Pre-opening phase"];
+    O_OPENIN = -1 [(bdm_quote_status) = "Opening phase"];
+    T_TRADING = 0 [(bdm_quote_status) = "Opened for Trading"];
+    Y_FORBIDDEN = 1 [(bdm_quote_status) = "Forbidden phase"];
+    H_HALTED = 2 [(bdm_quote_status) = "Halted phase"];
+    Z_FROZEN = 3 [(bdm_quote_status) = "Frozen"];
+    A_COMPLIANCE = 4 [(bdm_quote_status) = "Compliance phase"];
+    C_EOD = 5 [(bdm_quote_status) = "End of Day"];
+}
+
+enum StockStatus {
+    A = 0 [(QuoteLib.stk_status) = "Authorized"];
+    I = 1 [(QuoteLib.stk_status) = "Inhibited"];
+    AR = 2 [(QuoteLib.stk_status) = "Authorized Delayed"];
+    IR = 3 [(QuoteLib.stk_status) = "Inhibited Delayed"];
+    AS = 4 [(QuoteLib.stk_status) = "Authorized Halted"];
+    IS = 5 [(QuoteLib.stk_status) = "Inhibited Halted"];
+    AG = 6 [(QuoteLib.stk_status) = "Authorized Frozen"];
+    IG = 7 [(QuoteLib.stk_status) = "Inhibited Frozen"];
+    AE = 8 [(QuoteLib.stk_status) = "Authorized Price Movement Delayed"];
+    AF = 9 [(QuoteLib.stk_status) = "Authorized Price Movement Frozen"];
+    IE = 10 [(QuoteLib.stk_status) = "Inhibited Price Movement Delayed"];
+    IF = 11 [(QuoteLib.stk_status) = "Inhibited Price Movement Frozen"];
+} // access in java
+
+//enumValueDescriptor.getOptions().getExtension(MyProtobufOuterClass.friendly_name);
+enum DivCodes {
+    option allow_alias = true;
+    S_BLANK = 0 [(divdes) = ""];
+    S_CASH = 1 [(divdes) = "Cash equivalent of a stock dividend"];
+    S_OPTION_TRD = 2 [(divdes) = "Option traded stock"];
+    S_INC_DIV = 3 [(divdes) = "Increase in rate"];
+    S_DEC_DIV = 4 [(divdes) = "Decrease in rate"];
+    S_SKT_DIV = 5 [(divdes) = "Stock dividend"];
+    S_FST_DIV = 6 [(divdes) = "First dividend since listing on TSX"];
+    S_FST_S_INC = 7
+    [(divdes) = "First dividend since incorporation or issuance"];
+    S_FLW_SKT_SPLIT = 8 [(divdes) = "Following stock split"];
+    S_XTR_DIV = 9 [(divdes) = "Extra dividend"];
+    S_US_CCY_DIV = 10 [(divdes) = "US funds"];
+    S_EST_DIV = 11 [(divdes) = "Estimated dividend"];
+    S_OT_CCY_DIV = 12 [(divdes) = "Funds other than US"];
+    S_PART_ARR = 13 [(divdes) = "Partial arrears payment"];
+    S_TAX_DEF = 14 [(divdes) = "Tax deferred"];
+    S_FST_REORG = 15 [(divdes) = "First dividend since re-org of shares"];
+    S_RT_WRT_EXDIV = 16 [(divdes) = "Rights or warrants also trading ex-div"];
+    S_OR_SKT_ILC = 17 [(divdes) = "Or stock in lieu of cash"];
+    S_DIV_RES = 18 [(divdes) = "Dividend payments resumed"];
+    S_DIV_OM = 19 [(divdes) = "Dividend omitted"];
+    S_DIV_DEF = 20 [(divdes) = "Dividend deferred"];
+    S_ARR_PIF = 21 [(divdes) = "Arrears paid in full"];
+    S_DIV_RESC = 22 [(divdes) = "Dividend rescinded"];
+    S_FORMULA = 99 [(divdes) = "formula"];
+    L_SHIFT = 7;
+    D_TO_EX = 0x7F;
+    MRKR1 = 0x3F80;
+    MRKR2 = 0x1FC000;
+    MRKR3 = 0xFE00000;
+} //Quantum X Types
+enum CrossTypes {
+    NORM = 0; // normal trade
+    INT = 1; // Interal
+    CONT = 2; // Contingent
+    SPEC = 3; // Special Trading Session
+    VWAP = 4; // Vwap
+    BASI = 5;
+    // Vwap
+} //Quantum Sett type
+enum SettlementTypes {
+    CA = 0; // cash
+    NN = 1; // non netted
+    MS = 2;
+    // derivative related contingent trade
+    CT = 3; // Cash today
+    DT = 4;
+    // settlement date
+} //BDM Trade markers
+enum BDMTrdMrks {
+    NORM_TRD = 32;
+    CXL_TRD = 88;
+    ASOF_TRD = 65;
+    BLK_TRD = 66;
+    X_TRD = 68;
+    EFP_TRD = 69;
+    IMP_TRD = 73;
+    COM_BL_TRD = 75;
+    LATE_TRD = 76;
+    STRT_TRD = 80;
+    EFR_TRD = 82;
+    REF_PRC = 83;
+    COM_TRD = 84;
+    V_ADJ_TRD = 86;
+}
+
+enum CCY {
+    CAD = 0 [(ccy) = "CAD"];
+    USD = 1 [(ccy) = "USD"];
+    GBP = 2 [(ccy) = "GBP"];
+    AUD = 3 [(ccy) = "AUD"];
+    BSD = 4 [(ccy) = "BSD"];
+    JPY = 5 [(ccy) = "JPY"];
+    FRC = 6 [(ccy) = "EUR"];
+    GUI = 7 [(ccy) = "EUR"];
+    NZD = 8 [(ccy) = "NZD"];
+    EUR = 9 [(ccy) = "EUR"];
+}
+
+enum MktState {
+    PRE_OPEN = 1 [(mkt_status) = "Pre-open"]; //
+    OPENING = 2 [(mkt_status) = "Opening"]; //;
+    OPEN = 3 [(mkt_status) = "Open"]; //;
+    CLOSED = 4 [(mkt_status) = "Closed"]; //;
+    EXT_HRS_OPE = 5 [(mkt_status) = "Extended Hours Open"]; //;
+    EXT_HRS_CLS = 6 [(mkt_status) = "Extended Hours Close"]; //;
+    EXT_HRS_CXL = 7 [(mkt_status) = "Extended Hours CXLs"]; //;
+    MOC_IMB = 8 [(mkt_status) = "MOC Imbalance"]; //;
+    CCP_DET = 9 [(mkt_status) = "CCP Determination"]; //;
+    PME_EXT = 10 [(mkt_status) = "Price Movement Extension"]; //;
+    CLOSING = 11 [(mkt_status) = "Closing"]; //;
+}
+
+enum MsgTypes { //Message types
+    UNDEFINED = 0;
+    QUOTE = 1;
+    MOC = 2;
+    TRADE = 3;
+    TRADE_CXL = 4;
+    TRADE_CORR = 5;
+    STK_STATUS = 6;
+    INDEX = 7;
+    EQ_SUMM = 8;
+    DIVIDEND = 9;
+    HILO52 = 10;
+    BULLETIN = 11;
+    EQUITY_VOLUME = 12;
+    INFO_MSG = 13;
+    MKT_STAT = 14;
+    OPTION_QUOTE = 30;
+    OPTION_TRADE = 31;
+    OPTION_RFQ = 32;
+    OPTION_STAT = 33;
+    FUTURE_QUOTE = 34;
+    FUTURE_TRADE = 35;
+    FUTURE_RFQ = 36;
+    FUTURE_STAT = 37;
+    FUTOPT_BULLETIN = 38;
+    OPTION_DFN = 39;
+    FUTURE_DFN = 40;
+    FUTOPT_DFN = 41;
+    STRAT_DFN = 42;
+    OPT_DEPTH = 43;
+    FUOP_DEPTH = 44;
+    FUT_DEPTH = 45;
+    STR_DEPTH = 46;
+    DEPTH_QUOTE = 47;
+    FO_END_OF_TRANS = 48;
+    QF_SYM_STATUS = 49;
+    QF_MOC_PMD = 50;
+    QF_MKT_STATE = 51;
+    QF_TRD_TIER_STATUS = 52;
+    FOREX_QUOTE =53;
+}
+
+message Quote {
+    required MsgTypes MsgType = 1 [default = QUOTE]; //Types Quote + MOC
+    required double ask = 2 [default = 0];
+    required double bid = 3 [default = 0];
+    required int32 askSize = 4 [default = 0];
+    required int32 bidSize = 5 [default = 0];
+    optional string ex_time = 6 [default = "HHMMSSmmmmmm"];
+}
+
+// Trade message + Trade cxl + trade correction
+message Trade {
+    required MsgTypes MsgType = 1 [default = TRADE];
+    //Types TRADE + TRADE_CXL +  TRADE CORREC
+    required double last = 2 [default = 0]; //
+    required int32 volume = 4 [default = 0];
+    optional int32 buyerID = 5 [default = 0]; // Buyer ID
+    optional int32 sellerID = 6 [default = 0]; // Seller ID
+    required string trdTime = 7 [default = "HHMMSS"]; // HHMMSS
+    optional CrossTypes xtype = 8 [default = NORM]; // X type
+    optional bool isopen = 9 [default = false];
+    optional bool isbypass = 10 [default = false];
+    optional bool ismoc = 11 [default = false];
+    optional SettlementTypes sterms = 12 [default = CA];
+    optional string ex_time = 13 [default = "HHMMSSmmmmmm"];
+    optional int64 lo_time = 14 [default = 0];
+    optional double trd_px = 15 [default = 0];
+    optional bool iscxl = 17 [default = false];
+    optional bool iscor = 18 [default = false];
+}
+
+//For Halt and Resume trading
+message StkStatus {
+    required MsgTypes MsgType = 1 [default = STK_STATUS];
+    required string timeHalted = 2 [default = "HHMMSSmmmmmm"];
+    required string reason = 3
+    [default = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"];
+    required string expectedOpen = 4 [default = "\0\0\0\0\0\0\0"];
+    required StockStatus state = 5 [default = A];
+}
+
+// Index Level
+message Index {
+    required MsgTypes MsgType = 1 [default = INDEX];
+    required bool isinterim = 2 [default = false];
+    optional double last = 3 [default = 0];
+    optional double change = 4 [default = 0];
+    optional double volume = 5 [default = 0];
+    optional int32 value = 6 [default = 0];
+    optional double high = 7 [default = 0];
+    optional double low = 8 [default = 0];
+    optional double close = 9 [default = 0];
+    optional double open = 10 [default = 0];
+    optional double bid = 11 [default = 0];
+    optional double ask = 12 [default = 0];
+    optional double yield =13 [default =0];
+    optional double pe = 14 [default =0];
+    optional bool isclose = 15 [default =false];
+    optional double settle = 16 [default = 0];
+}
+
+// Dividend
+message Dividend {
+    required MsgTypes MsgType = 1 [default = DIVIDEND];
+    required string paydate = 2 [default = "YYMMDD"];
+    required string recdate = 3 [default = "YYMMDD"];
+    required string exdate = 4 [default = "YYMMDD"];
+    required string decdate = 5 [default = "YYMMDD"];
+    optional string divstr = 6 [default = ""];
+    required float div = 7 [default = 0];
+    required uint32 markers = 8 [default = 0];
+}
+
+// High Low transactions
+message HiLo52 {
+    required MsgTypes MsgType = 1 [default = HILO52];
+} //
+message EquityVolume {
+    required MsgTypes MsgType = 1 [default = EQUITY_VOLUME];
+}
+
+message Moc {
+    required MsgTypes MsgType = 1 [default = MOC];
+    optional int32 side = 2 [default = 0];
+    optional int32 ccp = 3 [default = 0];
+    optional int32 vwap = 4 [default = 0];
+    optional StockStatus state = 5 [default = A];
+    optional int32 ccp_pow = 6 [default = 5];
+    optional int32 vwap_pow = 7 [default = 5];
+    optional string ex_time = 8 [default = "HHMMSSmmmmmm"];
+}
+
+message Info {
+    required MsgTypes MsgType = 1 [default = INFO_MSG];
+    optional string msg = 2
+    [default = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"];
+    optional string ex_time = 3 [default = "HHMMSSmmmmmm"];
+}
+
+message EquitySummary {
+    required MsgTypes MsgType = 1 [default = EQ_SUMM];
+    required double ask = 2 [default = 0];
+    required double bid = 3 [default = 0];
+    required int32 askSize = 4 [default = 0];
+    required int32 bidSize = 5 [default = 0];
+    required double last = 6 [default = 0];
+    required int32 tick = 7 [default = 0];
+    required double chgFromClose = 8 [default = 0];
+    required double open = 9 [default = 0];
+    required double high = 10 [default = 0];
+    required double low = 11 [default = 0];
+    required double value = 12 [default = 0];
+    required double volume = 13 [default = 0];
+    required int32 trades = 14 [default = 0];
+    required CCY ccy = 15 [default = CAD];
+    required double adivs = 16 [default = 0];
+    required CCY dccy = 17 [default = CAD];
+    required int32 imo = 18 [default = 0];
+    required double eps = 19 [default = 0];
+}
+
+message MktStat {
+    required MsgTypes MsgType = 1 [default = MKT_STAT];
+    required double high = 2 [default = 0];
+    required double low = 3 [default = 0];
+    required double close = 4 [default = 0];
+    required double pclose = 5 [default = 0];
+    required int32 volume = 6 [default = 0];
+    required double value = 7 [default = 0];
+    required string lowtime = 8 [default = "HHMMSS"];
+    required string hightime = 9 [default = "HHMMSS"];
+    required double open = 10 [default = 0];
+    required int32 numtrades = 11 [default = 0];
+    required StockStatus state = 12 [default = A];
+    required int32 moc = 13 [default = 0];
+    optional int32 stkgrp = 14 [default = -1];
+}
+
+message OptQuote {
+    required MsgTypes MsgType = 1 [default = OPTION_QUOTE];
+    required float bid = 2 [default = 0];
+    required float ask = 3 [default = 0];
+    required int32 bidSize = 4 [default = 0];
+    required int32 askSize = 5 [default = 0];
+    required bool isAmer = 6 [default = true];
+    required int32 multiplier = 7 [default = 100];
+    required float strike = 8 [default = 0];
+    required string expiry = 9 [default = "20010101"];
+    required bool isHalted = 10 [default = false];
+    optional int32 seq_num = 11 [default = 0];
+}
+
+message OptTrade {
+    required MsgTypes MsgType = 1 [default = OPTION_TRADE];
+    required int32 volume = 2 [default = 0];
+    required float last = 3 [default = 0];
+    required int32 oi = 4 [default = 0];
+    required string expiry = 5 [default = "20000101"];
+    required float strike = 6 [default = 0];
+    optional bool iscxl = 7 [default = false];
+    required string TrdTime = 8 [default = "080000"];
+    required float chg = 9 [default = 0];
+    required bool isAmer = 10 [default = true];
+    required int32 multiplier = 11 [default = 100];
+    required int32 trdmrkr = 12 [default = 0];
+    optional int32 seq_num = 13 [default = 0];
+}
+
+message OptRFQ {
+    required MsgTypes MsgType = 1 [default = OPTION_RFQ];
+    required bool isAmer = 2 [default = true];
+    required int32 multiplier = 3 [default = 100];
+    required float strike = 4 [default = 0];
+    optional string expiry = 5 [default = "20010101"];
+    required int32 size = 6 [default = 0];
+}
+
+message OptStat {
+    required MsgTypes MsgType = 1 [default = OPTION_STAT];
+    required float bid = 2 [default = 0];
+    required int32 bidSize = 3 [default = 0];
+    required float ask = 4 [default = 0];
+    required int32 askSize = 5 [default = 0];
+    required float last = 6 [default = 0];
+    required int32 oi = 7 [default = 0];
+    required int32 volume = 8 [default = 0];
+    required float chg = 9 [default = 0];
+    required float open = 10 [default = 0];
+    required float high = 11 [default = 0];
+    required float low = 12 [default = 0];
+    optional bool isHalted = 13 [default = false];
+    required int32 multiplier = 14 [default = 100];
+    optional int32 seq_num = 15 [default = 0];
+    required string hitime = 16 [default = "080001"];
+    required string lotime = 17 [default = "080001"];
+    required string expiry = 18 [default = "20010101"];
+    required float value = 20 [default = 0];
+    required float close = 21 [default = 0];
+    required float pdclose = 22 [default = 0];
+    required float strike = 23 [default = 0];
+    required bool isAmer = 24 [default = true];
+}
+
+message FutQuote {
+    required MsgTypes MsgType = 1 [default = FUTURE_QUOTE];
+    required float bid = 2 [default = 0];
+    required float ask = 3 [default = 0];
+    required float bidSize = 4 [default = 0];
+    required float askSize = 5 [default = 0];
+    required bool isHalted = 6 [default = false];
+    required string expiry = 7 [default = "20000101"];
+    required int32 multiplier = 8 [default = 200];
+    optional int32 seq_num = 9 [default = 0];
+}
+
+message FutTrade {
+    required MsgTypes MsgType = 1 [default = FUTURE_TRADE];
+    required int32 volume = 2 [default = 0];
+    required float last = 3 [default = 0];
+    required float chg = 4 [default = 0];
+    required bool iscxl = 5 [default = false];
+    required string expiry = 6 [default = "20000101"];
+    required string TrdTime = 7 [default = "080000"];
+    required int32 multiplier = 8 [default = 100];
+    required int32 trdmrkr = 9 [default = 0];
+    optional int32 seq_num = 10 [default = 0];
+}
+
+message FutRFQ {
+    required MsgTypes MsgType = 1 [default = FUTURE_RFQ];
+    required int32 multiplier = 3 [default = 100];
+    optional string expiry = 5 [default = "20010101"];
+    required int32 size = 6 [default = 0];
+    optional int32 seq_num = 12 [default = 0];
+}
+
+message FutStat {
+    required MsgTypes MsgType = 1 [default = FUTURE_STAT];
+    required float bid = 2 [default = 0];
+    required float ask = 3 [default = 0];
+    required float bidSize = 4 [default = 0];
+    required float askSize = 5 [default = 0];
+    required float open = 6 [default = 0];
+    required float high = 7 [default = 0];
+    required float low = 8 [default = 0];
+    required float settle = 9 [default = 0];
+    required float chg = 10 [default = 0];
+    required float psettle = 11 [default = 0];
+    required float oi = 12 [default = 0];
+    required int32 volume = 13 [default = 0];
+    required float last = 14 [default = 0];
+    required bool isHalted = 15 [default = false];
+    optional int32 seq_num = 16 [default = 0];
+    required string hitime = 17 [default = "080001"];
+    required string lotime = 18 [default = "080001"];
+    required string expiry = 19 [default = "200101"];
+    required float value = 20 [default = 0];
+    required float multiplier = 21 [default = 0];
+}
+
+message FutOptBulletin {
+    required MsgTypes MsgType = 1 [default = FUTOPT_BULLETIN];
+    optional string Message = 2 [default = ""];
+}
+
+message InstrDfn {
+    required MsgTypes MsgType = 1 [default = OPTION_DFN];
+    required string strikeCCY = 2 [default = "CAD"];
+    required int32 maxOrdersz = 3 [default = 0];
+    required int32 minOrdersz = 4 [default = 0];
+    required float maxPxThresh = 5 [default = 0];
+    required float minPxThresh = 6 [default = 0];
+    required float tickinc = 7 [default = 0];
+    optional bool isAmer = 8 [default = true];
+    required string type = 9 [default = "xx"];
+    required string group = 10 [default = "xx"];
+    required string instr = 11 [default = "xxxx"];
+    required string externID = 12 [default = ""];
+    required string marker = 13 [default = "  "];
+    required string ulrootsym = 14 [default = ""];
+    required int32 consize = 15 [default = 0];
+    required float tick = 16 [default = 0];
+    required string ulccy = 17 [default = "xxx"];
+    optional int32 expday = 18 [default = 0];
+    optional float strike = 19 [default = 0];
+    optional int32 exmnth = 20 [default = 0];
+    optional int32 exyr = 21 [default = 0];
+}
+
+message Depthquote {
+    required float bid = 2 [default = 0];
+    required float ask = 3 [default = 0];
+    required int32 bidSize = 4 [default = 0];
+    required int32 askSize = 5 [default = 0];
+    required int32 nbidOrd = 6 [default = 0];
+    required int32 naskOrd = 7 [default = 0];
+    required int32 level = 8 [default = 0];
+    required int64 asktime = 9 [default = 0];
+    required int64 bidtime = 10 [default = 0];
+}
+
+message BDMDepth {
+    required MsgTypes MsgType = 1 [default = OPT_DEPTH];
+    optional bool isAmer = 2 [default = true];
+    optional int32 multiplier = 3 [default = 100];
+    optional float strike = 4 [default = 0];
+    required string expiry = 5 [default = "20010101"];
+    repeated Depthquote quote = 6;
+}
+
+message EndOfSales {
+    required MsgTypes MsgType = 1 [default = FO_END_OF_TRANS];
+    required bool End = 2 [default = false];
+    required string Time = 3 [default = "230000"];
+}
+
+message qfSymbStatus {
+    required MsgTypes MsgType = 1 [default = QF_SYM_STATUS];
+    required string symbol = 2 [default = "XXX.XX.X\0"];
+    optional string exchID = 3 [default = "XXX\0"];
+    required string cusip = 4 [default = "XXXXXXXXXXXX\0"];
+    optional int32 lotsz = 5 [default = 100];
+    optional string ccy = 6 [default = "CAD\0"];
+    optional double db_fv = 7 [default = 0];
+    optional double last = 8 [default = 0];
+    optional bool moc_elig = 9 [default = false];
+    optional bool is_stk = 10 [default = true];
+    required string issuer = 11
+    [default = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"];
+    optional int32 stkgrp = 12 [default = 0];
+    optional StockStatus state = 13 [default = A];
+}
+
+message MarketState {
+    required MsgTypes MsgType = 1 [default = QF_MKT_STATE];
+    required MktState state = 2 [default = PRE_OPEN];
+    required int32 stkgrp = 3 [default = 0];
+    optional string ex_time = 4 [default = "HHMMSSmmmmmmm"];
+}
+
+message TradingTierStatus {
+    required MsgTypes MsgType = 1 [default = QF_TRD_TIER_STATUS];
+    required string exch_id = 2 [default = "XXX\0"];
+    required int32 num_symbols = 3 [default = 0];
+    required int32 num_stk_grp = 4 [default = 0];
+    optional string ex_time = 5 [default = "HHMMSSmmmmmm"];
+    required string tierid = 6 [default = "XXXXXX"];
+}
